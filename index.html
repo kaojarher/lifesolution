@@ -17,7 +17,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Serif TC","
 .cab{background:var(--red);border-radius:8px;padding:10px;box-shadow:0 6px 0 #8f1610}
 .roof{background:linear-gradient(#f4cf5a,#d6a21c);margin:-10px -10px 10px;padding:10px 10px 4px;border-radius:8px 8px 0 0;clip-path:polygon(4% 0,96% 0,100% 100%,0 100%)}
 .title{background:#f7e27a;border:2px solid #7a4a10;display:flex;align-items:center;justify-content:center;gap:.4em;padding:6px;font-weight:900;font-size:clamp(20px,6vw,28px);letter-spacing:.2em}
-.title input{font:inherit;letter-spacing:.1em;width:6.5em;max-width:40%;background:transparent;border:0;border-bottom:2px dashed #7a4a10;text-align:center;color:#2a1a14;border-radius:0}
+.title{overflow:hidden;white-space:nowrap}
+.title input{font:inherit;letter-spacing:.1em;width:6.5em;flex:none;background:transparent;border:0;border-bottom:2px dashed #7a4a10;text-align:center;color:#2a1a14;border-radius:0}
 .title input::placeholder{color:#8a6a30;font-weight:600;font-size:.6em;letter-spacing:0}
 .win{position:relative;height:clamp(250px,70vw,310px);border:4px solid #8f1610;border-radius:4px;overflow:hidden;background:#8c7b6b center/cover no-repeat}
 .win::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.18),transparent 35%);pointer-events:none}
@@ -141,7 +142,10 @@ function loadImp(){try{const j=JSON.parse(ls.g('lq_imp')||'{}');for(const k in j
 function stat(){const n=Object.keys(D).length,m=Object.values(D).filter(d=>d.i.length===KEYS.length&&!d.imp).length;$('stat').textContent='已有詩文：'+n+' / 60 首；其中 '+m+' 首含完整籤解（29 項）與故事；其餘將顯示'+NA}
 loadImp();stat();$('sp').innerHTML=Object.entries(SP).map(([k,v])=>`<p><b>${k}</b><br>${v.map(esc).join('<br>')}</p>`).join('');
 // settings
-$('temple').value=ls.g('lq_t')||'';$('temple').oninput=e=>ls.s('lq_t',e.target.value);
+const fitTitle=()=>{const t=document.querySelector('.title'),i=$('temple');t.style.fontSize='';i.style.width=Math.max(6.5,[...i.value].length*1.15+.5)+'em';
+ let fs=parseFloat(getComputedStyle(t).fontSize);while(t.scrollWidth>t.clientWidth&&fs>10){fs-=1;t.style.fontSize=fs+'px'}};
+$('temple').value=ls.g('lq_t')||'';$('temple').oninput=e=>{ls.s('lq_t',e.target.value);fitTitle()};
+addEventListener('resize',fitTitle);fitTitle();document.fonts&&document.fonts.ready.then(fitTitle);
 const setBg=u=>{const w=$('bg').style;w.backgroundImage=u?`url("${u}")`:'none';w.backgroundSize='cover';w.backgroundPosition='center';w.backgroundRepeat='no-repeat'};
 const sb=ls.g('lq_bg');if(sb){setBg(sb);$('bgurl').value=sb}
 $('bgset').onclick=()=>{const u=$('bgurl').value.trim();setBg(u);ls.s('lq_bg',u)};
