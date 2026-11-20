@@ -86,7 +86,22 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .close{width:100%;margin-top:12px;background:var(--red);color:#fff;border:0;border-radius:6px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.fig.walk svg,.slip{animation:none}}
 :focus-visible{outline:3px solid #2f6fb5;outline-offset:2px}
+.fig canvas{display:none;position:absolute;left:50%;margin-left:-34px;bottom:0;width:68px;height:104px;pointer-events:none}
+.fig.vrm canvas{display:block}
+.fig.vrm svg,.fig.vrm img,.fig.vrm .hs{display:none}
+.pick{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px 12px;min-width:0}
+.pick legend{font-weight:700;padding:0 6px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{margin:0;flex:1;min-width:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;text-align:center;padding:9px 6px;min-height:44px;border:2px solid var(--line);border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;background:var(--bg)}
+.seg input:checked+span{border-color:var(--red);background:var(--red);color:#fff}
+.seg input:focus-visible+span{outline:3px solid var(--navy);outline-offset:2px}
+.pane{margin-top:8px}
+.pane[hidden]{display:none}
+.pane select{width:100%;font:inherit;font-size:13px;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);min-height:40px}
 </style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/","@pixiv/three-vrm":"https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.1.2/lib/three-vrm.module.js"}}</script>
 </head>
 <body>
 <div class="wrap">
@@ -96,7 +111,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <div id="bg"></div><svg viewBox="0 0 400 300" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" aria-hidden="true"><defs><pattern id="gv" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#4f9a3a"/><path d="M2 10L3 5M6 10L7 4M9 8L9 4" stroke="#3a7a2c" stroke-width="1.2"/><circle cx="4" cy="3" r=".8" fill="#6bb653"/></pattern><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8dc6a"/><stop offset="1" stop-color="#c99412"/></linearGradient></defs><polygon points="0,120 400,108 400,300 0,300" fill="url(#gv)"/><polygon points="246,128 318,124 262,300 56,300" fill="#cbb89b"/><path d="M111 250L278 250M156 210L291 210M194 175L302 175M222 150L310 150M125 300L270 128M194 300L294 126" stroke="#9c8a6c" stroke-width="1.5" fill="none"/><polygon points="172,290 238,290 252,264 190,264" fill="#8a3b2a"/><rect x="246" y="86" width="72" height="44" fill="#4a0c08" opacity=".75"/><rect x="292" y="104" width="18" height="26" rx="3" fill="#6b2b17" stroke="#e9b72b" stroke-width="2"/><text x="301" y="121" font-size="7" fill="#e9b72b" text-anchor="middle">籤筒</text><rect x="236" y="76" width="9" height="54" fill="#c1221b"/><rect x="320" y="76" width="9" height="54" fill="#c1221b"/><rect x="232" y="80" width="101" height="8" fill="#c1221b" stroke="#8f1610"/><rect x="252" y="90" width="58" height="13" fill="#f7e27a" stroke="#2a1a14"/><text x="281" y="100" font-size="9" font-weight="700" fill="#2a1a14" text-anchor="middle" letter-spacing="2">靈籤舍</text><path d="M168 40Q200 62 240 60L330 60Q372 60 396 24Q392 74 330 78L240 78Q190 78 168 40Z" fill="url(#gd)" stroke="#a77a10"/><g fill="#e2b52c" stroke="#a77a10"><circle cx="214" cy="78" r="5"/><circle cx="230" cy="79" r="5"/><circle cx="246" cy="79" r="5"/><circle cx="262" cy="79" r="5"/><circle cx="278" cy="79" r="5"/><circle cx="294" cy="79" r="5"/><circle cx="310" cy="79" r="5"/><circle cx="326" cy="78" r="5"/><circle cx="342" cy="76" r="5"/></g><g stroke="#c1221b" stroke-width="5" fill="none"><polyline points="36,262 102,211 168,160 236,108"/><polyline points="36,277 102,224 168,171 236,117"/><polyline points="282,268 298,214 314,160 330,104"/><polyline points="282,283 298,227 314,171 330,113"/></g><g fill="#c1221b" stroke="#8f1610"><rect x="30" y="254" width="11" height="38"/><rect x="97" y="205" width="9" height="32"/><rect x="164" y="155" width="8" height="27"/><rect x="232" y="104" width="7" height="22"/><rect x="276" y="260" width="11" height="38"/><rect x="294" y="208" width="9" height="32"/><rect x="310" y="155" width="8" height="27"/><rect x="326" y="100" width="7" height="22"/></g></svg>
   
   <div class="tray"><span>取簽處</span><button class="slip" id="slip" aria-label="點擊查看籤詩"></button></div>
-  <div class="fig" id="fig"><img id="figimg" alt=""><span class="hs"></span><svg viewBox="0 0 34 60"><circle cx="17" cy="9" r="8" fill="#f1c9a0"/><path d="M5 20h24l4 28H1z" fill="#3b78c4"/><rect x="9" y="48" width="6" height="11" fill="#2a2a2a"/><rect x="19" y="48" width="6" height="11" fill="#2a2a2a"/><rect class="held" x="26" y="18" width="5" height="22" fill="#f4d98a" stroke="#a97a15"/></svg></div>
+  <div class="fig" id="fig"><canvas id="vrmcv" width="68" height="104" aria-hidden="true"></canvas><img id="figimg" alt=""><span class="hs"></span><svg viewBox="0 0 34 60"><circle cx="17" cy="9" r="8" fill="#f1c9a0"/><path d="M5 20h24l4 28H1z" fill="#3b78c4"/><rect x="9" y="48" width="6" height="11" fill="#2a2a2a"/><rect x="19" y="48" width="6" height="11" fill="#2a2a2a"/><rect class="held" x="26" y="18" width="5" height="22" fill="#f4d98a" stroke="#a97a15"/></svg></div>
   
  </div>
  <div class="low">
@@ -107,14 +122,34 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 </div>
 
 <details>
- <summary>設定：背景圖與籤詩資料</summary>
+ <summary>設定：背景圖與籤詩資料／選擇人偶</summary>
+ <details class="pick" open>
+ <summary>選擇走進去抽籤的人</summary>
+ <div class="seg" role="radiogroup" aria-label="人偶類型">
+  <label><input type="radio" name="fm" value="def"><span>內建人偶</span></label>
+  <label><input type="radio" name="fm" value="img"><span>自訂圖片</span></label>
+  <label><input type="radio" name="fm" value="vrm"><span>VRM 角色</span></label>
+ </div>
+ <div class="pane" id="pane-img" hidden>
+  <label for="figurl">圖片網址</label>
+  <div class="row"><input type="text" id="figurl" placeholder="https://…png（建議透明背景）"><button class="btn" id="figset">套用</button></div>
+  <label for="figfile">或載入本機圖片</label>
+  <div class="row"><input type="file" id="figfile" accept="image/*"><button class="btn" id="figclr">清除圖片</button></div>
+  <p class="small">尚未設定圖片時，會先使用內建人偶。</p>
+ </div>
+ <div class="pane" id="pane-vrm" hidden>
+  <label for="vrmsel">預設 VRM 角色</label>
+  <select id="vrmsel"></select>
+  <p class="small" id="vrminfo"></p>
+  <label for="vrmfile">或載入本機 .vrm 檔</label>
+  <input type="file" id="vrmfile" accept=".vrm">
+  <p class="small" id="vrmst" role="status">首次選用需下載模型，請稍候。</p>
+ </div>
+</details>
  <label for="bgurl">背景圖網址</label>
  <div class="row"><input type="text" id="bgurl" placeholder="https://…jpg"><button class="btn" id="bgset">套用</button></div>
  <label for="bgfile">或載入本機圖片</label>
  <div class="row"><input type="file" id="bgfile" accept="image/*"><button class="btn" id="bgclr">清除背景</button></div>
- <label for="figurl">機關人圖片（預設為內建人偶）</label>
- <div class="row"><input type="text" id="figurl" placeholder="https://…png（建議透明背景）"><button class="btn" id="figset">套用</button></div>
- <div class="row" style="margin-top:6px"><input type="file" id="figfile" accept="image/*"><button class="btn" id="figclr">恢復預設</button></div>
  <label for="imp">匯入各廟籤詩（每行一首）</label>
  <textarea id="imp" placeholder="序號|詩文(四句以/分隔)|白話|旅行|健康|感情|財運|求子|運勢"></textarea>
  <div class="row" style="margin-top:6px"><button class="btn" id="impgo">匯入</button><button class="btn" id="impclr">清除匯入</button></div>
@@ -154,14 +189,47 @@ $('bgfile').onchange=e=>{const f=e.target.files[0];if(f)setBg(URL.createObjectUR
 $('impgo').onclick=()=>{const o={};$('imp').value.split('\n').forEach(l=>{const p=l.split('|').map(x=>x.trim());const n=+p[0];if(n>=1&&n<=60&&p[1]){o[n]=[p[1],p[2]||'',p.slice(3,9).join('|'),'匯入']}});
  ls.s('lq_imp',JSON.stringify(o));loadImp();stat();$('stat').textContent+='（本次匯入 '+Object.keys(o).length+' 首）'};
 $('impclr').onclick=()=>{ls.s('lq_imp','{}');location.reload()};
-// figure image
+// figure mode: def | img | vrm
 const fg=$('fig'),fi=$('figimg');
-const setFig=u=>{if(u){fi.src=u;fg.classList.add('cust')}else{fi.removeAttribute('src');fg.classList.remove('cust')}};
-fi.onerror=()=>{setFig('');ls.s('lq_fig','');$('msg').textContent='機關人圖片無法載入，已恢復預設。'};
-const sf=ls.g('lq_fig');if(sf){setFig(sf);$('figurl').value=sf.startsWith('data:')?'':sf}
-$('figset').onclick=()=>{const u=$('figurl').value.trim();setFig(u);ls.s('lq_fig',u)};
-$('figclr').onclick=()=>{setFig('');$('figurl').value='';$('figfile').value='';ls.s('lq_fig','')};
-$('figfile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{setFig(r.result);ls.s('lq_fig',r.result.length<1500000?r.result:'')};r.readAsDataURL(f)};
+const FH=window.FH=window.FH||{};
+let fm=ls.g('lq_fm')||'def',figUrl=ls.g('lq_fig')||'';
+if(!['def','img','vrm'].includes(fm))fm='def';
+const showFig=()=>{
+ if(fm==='img'&&figUrl){if(fi.getAttribute('src')!==figUrl)fi.src=figUrl;fg.classList.add('cust')}else fg.classList.remove('cust');
+ fg.classList.toggle('vrm',fm==='vrm'&&!!FH.ready);
+ $('pane-img').hidden=fm!=='img';$('pane-vrm').hidden=fm!=='vrm';
+ document.querySelector('input[name=fm][value='+fm+']').checked=true;
+};
+const vinfo=()=>{const m=(FH.presets||[]).find(x=>x.id===$('vrmsel').value);$('vrminfo').textContent=m?m.ver+' · '+m.size+' MB · '+m.license:''};
+async function loadSel(){
+ const st=$('vrmst');
+ if(!FH.load){st.textContent='3D 引擎載入失敗（需連網載入 three.js），已改用內建人偶。';fm='def';ls.s('lq_fm','def');showFig();return}
+ const id=$('vrmsel').value;
+ if(FH.ready&&FH.curId===id){showFig();return}
+ $('vrmsel').disabled=true;$('vrmfile').disabled=true;
+ try{await FH.load(id)}catch(e){st.textContent='VRM 載入失敗，已改用內建人偶：'+(e&&e.message||e);if(fm==='vrm'){fm='def';ls.s('lq_fm','def')}}
+ $('vrmsel').disabled=false;$('vrmfile').disabled=false;showFig();
+}
+document.querySelectorAll('input[name=fm]').forEach(r=>r.onchange=()=>{fm=r.value;ls.s('lq_fm',fm);showFig();if(fm==='vrm')loadSel()});
+$('vrmsel').onchange=()=>{ls.s('lq_vrm',$('vrmsel').value);vinfo();if(fm==='vrm')loadSel()};
+$('vrmfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ if(!FH.load){$('vrmst').textContent='3D 引擎尚未載入。';return}
+ $('vrmst').textContent='讀取 '+f.name+'…';
+ try{await FH.load(null,URL.createObjectURL(f),f.name)}catch(err){$('vrmst').textContent='無法讀取此 VRM 檔：'+(err&&err.message||err)}
+ showFig()};
+addEventListener('fh-ready',()=>{
+ const sel=$('vrmsel'),groups={};
+ (FH.presets||[]).forEach(m=>{if(!groups[m.group]){const og=document.createElement('optgroup');og.label=m.group;sel.appendChild(og);groups[m.group]=og}
+  const o=document.createElement('option');o.value=m.id;o.textContent=m.name+' · '+m.size+' MB';groups[m.group].appendChild(o)});
+ const sv=ls.g('lq_vrm');sel.value=(FH.presets||[]).some(m=>m.id===sv)?sv:FH.defaultId;vinfo();
+ if(fm==='vrm')loadSel();
+});
+fi.onerror=()=>{figUrl='';ls.s('lq_fig','');$('msg').textContent='圖片無法載入，已恢復內建人偶。';showFig()};
+if(figUrl&&!figUrl.startsWith('data:'))$('figurl').value=figUrl;
+$('figset').onclick=()=>{figUrl=$('figurl').value.trim();ls.s('lq_fig',figUrl);showFig()};
+$('figclr').onclick=()=>{figUrl='';$('figurl').value='';$('figfile').value='';ls.s('lq_fig','');showFig()};
+$('figfile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{figUrl=r.result;ls.s('lq_fig',r.result.length<1500000?r.result:'');showFig()};r.readAsDataURL(f)};
+showFig();
 // pdf
 let dl=null;
 (async()=>{try{if(window.claude&&claude.use)dl=await claude.use('downloads')}catch(e){}})();
@@ -215,7 +283,13 @@ function initPdf(){const b=$('pdfbtn');if(!b)return;b.style.display='block';b.on
 // animation
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const fig=$('fig'),slip=$('slip');
-const go=async(l,b,s,ms)=>{fig.classList.add('walk');fig.style.transition=`left ${ms}ms linear,bottom ${ms}ms linear,transform ${ms}ms linear`;fig.style.left=l+'%';fig.style.bottom=b+'%';fig.style.transform=`scale(${s})`;await sleep(ms);fig.classList.remove('walk')};
+let pos={l:54,b:13};
+const go=async(l,b,s,ms)=>{
+ const w=$('win'),dx=(l-pos.l)*w.clientWidth/100,dy=(b-pos.b)*w.clientHeight/100;pos={l,b};
+ if(FH.move)FH.move(dx,dy);
+ fig.classList.add('walk');fig.style.transition=`left ${ms}ms linear,bottom ${ms}ms linear,transform ${ms}ms linear`;fig.style.left=l+'%';fig.style.bottom=b+'%';fig.style.transform=`scale(${s})`;await sleep(ms);fig.classList.remove('walk');
+ if(FH.stop)FH.stop();
+};
 let cur=0,busy=false;
 $('go').onclick=async()=>{
  if(busy)return;busy=true;$('go').disabled=true;slip.classList.remove('on');
@@ -224,12 +298,12 @@ $('go').onclick=async()=>{
  $('msg').textContent='人偶前往取簽…';
  await go(71,56,.62,1500);
  await go(70,62,.5,700);
- fig.classList.add('has');$('msg').textContent='從屋內籤筒取到簽了，送往取簽處…';await sleep(500);
+ fig.classList.add('has');if(FH.hold)FH.hold(true);$('msg').textContent='從屋內籤筒取到簽了，送往取簽處…';await sleep(500);
  await go(71,56,.62,700);
- await go(45,22,.95,1600);fig.classList.remove('has');
+ await go(45,22,.95,1600);fig.classList.remove('has');if(FH.hold)FH.hold(false);
  cur=1+Math.floor(Math.random()*60);
  slip.textContent=nm(cur)+'籤';slip.classList.add('on');
- await go(54,13,1,1100);
+ await go(54,13,1,1100);if(FH.happy)FH.happy();
  $('msg').textContent='簽已送到，請點擊取簽處的簽。';
  busy=false;$('go').disabled=false;$('go').textContent='再投幣 10 元';
 };
@@ -247,6 +321,131 @@ slip.onclick=()=>{
  $('card').innerHTML=h;$('dlg').showModal();initPdf();
 };
 const dlg=$('dlg');dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {VRMLoaderPlugin,VRMUtils} from '@pixiv/three-vrm';
+const FH=window.FH=window.FH||{};
+    const GH = (repo, branch, path) => [
+      `https://raw.githubusercontent.com/${repo}/${branch}/${path}`,
+      `https://cdn.jsdelivr.net/gh/${repo}@${branch}/${path}`
+    ];
+    const VROID_TERMS = 'VRoid 範例模型使用條件（可修改、散布，需遵守條款）';
+    const CC0_TERMS = 'CC0 公眾領域（無使用限制）';
+
+    const VRM_PRESETS = [
+      // --- ChatVRM 官方 ---
+      { id: 'chatvrm-b', group: 'ChatVRM 官方 (zoan37/ChatVRM)', name: 'AvatarSample_B（預設・最輕量）',
+        size: 6.7, ver: 'VRM 1.0', license: 'VRM 1.0 授權，允許再散布，免標註（VRoid Project / pixiv）',
+        urls: GH('zoan37/ChatVRM', 'main', 'public/AvatarSample_B.vrm') },
+
+      // --- VRoid Studio 官方範例 ---
+      { id: 'vroid-a', group: 'VRoid Studio 官方範例 (madjin/vrm-samples)', name: 'AvatarSample_A',
+        size: 15.1, ver: 'VRM 0.x', license: VROID_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/stable/AvatarSample_A.vrm') },
+      { id: 'vroid-b', group: 'VRoid Studio 官方範例 (madjin/vrm-samples)', name: 'AvatarSample_B（VRM 0.x 版）',
+        size: 15.4, ver: 'VRM 0.x', license: VROID_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/stable/AvatarSample_B.vrm') },
+      { id: 'vroid-c', group: 'VRoid Studio 官方範例 (madjin/vrm-samples)', name: 'AvatarSample_C',
+        size: 13.1, ver: 'VRM 0.x', license: VROID_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/stable/AvatarSample_C.vrm') },
+
+      // --- CC0 模型 ---
+      { id: 'orion', group: 'CC0 公眾領域模型', name: 'Orion（Polygonal Mind）',
+        size: 6.1, ver: 'VRM 0.x', license: CC0_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'Avatar_Orion.vrm') },
+      { id: 'vita', group: 'CC0 公眾領域模型', name: 'Vita',
+        size: 14.4, ver: 'VRM 0.x', license: CC0_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/beta/Vita.vrm') },
+      { id: 'vivi', group: 'CC0 公眾領域模型', name: 'Vivi',
+        size: 18.1, ver: 'VRM 0.x', license: CC0_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/beta/Vivi.vrm') },
+      { id: 'victoria', group: 'CC0 公眾領域模型', name: 'Victoria Rubin',
+        size: 15.5, ver: 'VRM 0.x', license: CC0_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/beta/Victoria_Rubin.vrm') },
+      { id: 'sakurada', group: 'CC0 公眾領域模型', name: 'Sakurada Fumiriya',
+        size: 19.3, ver: 'VRM 0.x', license: CC0_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/beta/Sakurada_Fumiriya.vrm') },
+      { id: 'shino', group: 'CC0 公眾領域模型', name: 'Sendagaya Shino',
+        size: 15.1, ver: 'VRM 0.x', license: CC0_TERMS,
+        urls: GH('madjin/vrm-samples', 'master', 'vroid/beta/Sendagaya_Shino.vrm') },
+
+      // --- 需標註作者 ---
+      { id: 'seed-san', group: '需標註作者', name: 'Seed-san（VirtualCast）',
+        size: 10.7, ver: 'VRM 1.0', license: 'VRM 1.0 授權，允許再散布；使用時「必須標註」作者：VirtualCast, Inc.',
+        urls: GH('madjin/vrm-samples', 'master', 'Seed-san/vrm/Seed-san.vrm') }
+    ];
+FH.presets=VRM_PRESETS;FH.defaultId='chatvrm-b';
+const cv=document.getElementById('vrmcv'),fgEl=document.getElementById('fig'),W=68,H=104;
+let renderer,scene,camera,slip,cur=null,isV0=false,baseYaw=0,hips0=0;
+function init(){
+ if(renderer)return;
+ renderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);renderer.setClearColor(0x000000,0);
+ scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(22,W/H,.1,50);
+ const dl=new THREE.DirectionalLight(0xffffff,2.2);dl.position.set(.6,1.5,2.5);scene.add(dl);scene.add(new THREE.AmbientLight(0xffffff,1.1));
+ slip=new THREE.Mesh(new THREE.BoxGeometry(.035,.17,.01),new THREE.MeshBasicMaterial({color:0xf4d98a}));slip.visible=false;scene.add(slip);
+}
+function setup(v){
+ if(cur){scene.remove(cur.scene);VRMUtils.deepDispose(cur.scene)}
+ VRMUtils.rotateVRM0(v);scene.add(v.scene);v.scene.traverse(o=>{o.frustumCulled=false});
+ cur=v;isV0=v.meta?.metaVersion==='0';baseYaw=v.scene.rotation.y;yaw=yawT=0;phase=0;amp=0;holdK=0;
+ v.scene.updateMatrixWorld(true);
+ const bb=new THREE.Box3().setFromObject(v.scene),h=bb.max.y-bb.min.y,cy=(bb.max.y+bb.min.y)/2;
+ const d=h*1.06/(2*Math.tan(THREE.MathUtils.degToRad(11)));
+ camera.position.set(0,cy,d);camera.lookAt(0,cy,0);
+ if(v.lookAt)v.lookAt.target=camera;
+ const hp=v.humanoid.getNormalizedBoneNode('hips');hips0=hp?hp.position.y:0;
+}
+FH.load=async(id,url,label)=>{
+ init();
+ const p=id&&VRM_PRESETS.find(x=>x.id===id),urls=p?p.urls:[url],st=document.getElementById('vrmst');
+ let last;
+ for(const u of urls){
+  try{
+   const gltf=await new Promise((res,rej)=>{const l=new GLTFLoader();l.register(pp=>new VRMLoaderPlugin(pp));
+    l.load(u,res,e=>{st.textContent=e.total?'載入 VRM… '+Math.round(e.loaded/e.total*100)+'%':'載入 VRM… '+(e.loaded/1048576).toFixed(1)+' MB'},rej)});
+   const v=gltf.userData.vrm;if(!v)throw new Error('不是有效的 VRM 檔案');
+   setup(v);FH.curId=id||'file';FH.ready=true;st.textContent='已載入：'+(p?p.name:label);
+   if(window.FH.refresh)window.FH.refresh();return;
+  }catch(e){last=e;console.warn('VRM source failed, trying next:',u,e)}
+ }
+ throw last||new Error('載入失敗');
+};
+let yaw=0,yawT=0,walking=false,phase=0,amp=0,holding=false,holdK=0,t=0,happyT=0,happyV=0,blinkT=2,blinkP=-1,last=performance.now();
+const tmp=new THREE.Vector3(),PI=Math.PI;
+FH.move=(dx,dy)=>{if(Math.hypot(dx,dy)>1)yawT=Math.atan2(dx,-dy);walking=true};
+FH.stop=()=>{walking=false};
+FH.hold=b=>{holding=b};
+FH.happy=()=>{happyT=2.5;yawT=0};
+function tick(now){
+ requestAnimationFrame(tick);
+ const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(!cur||!renderer||document.hidden||!fgEl.classList.contains('vrm'))return;
+ t+=dt;if(walking)phase+=dt*9;
+ amp+=((walking?1:0)-amp)*Math.min(1,dt*10);holdK+=((holding?1:0)-holdK)*Math.min(1,dt*8);
+ const hm=cur.humanoid,N=n=>hm.getNormalizedBoneNode(n);
+ const set=(n,x,y,z)=>{const b=N(n);if(b)b.rotation.set(isV0?-x:x,y,isV0?-z:z)};
+ const s=Math.sin(phase)*amp,L=(a,b)=>a+(b-a)*holdK;
+ set('leftUpperLeg',-s*.6,0,0);set('rightUpperLeg',s*.6,0,0);
+ set('leftLowerLeg',Math.max(0,Math.cos(phase))*.7*amp,0,0);set('rightLowerLeg',Math.max(0,-Math.cos(phase))*.7*amp,0,0);
+ set('leftUpperArm',.1+s*.45,0,-1.3);set('leftLowerArm',0,0,-.15);
+ set('rightUpperArm',L(.1-s*.45,-.9),0,L(1.3,1.15));set('rightLowerArm',L(0,-.7),0,L(.15,.1));
+ set('spine',.04*amp,Math.sin(phase)*.08*amp,0);set('chest',Math.sin(t*1.6)*.015,0,0);
+ const hp=N('hips');if(hp)hp.position.y=hips0+Math.abs(Math.sin(phase))*.02*amp;
+ const diff=((yawT-yaw+PI)%(2*PI)+2*PI)%(2*PI)-PI;yaw+=diff*Math.min(1,dt*8);cur.scene.rotation.y=baseYaw+yaw;
+ const em=cur.expressionManager;
+ if(em){blinkT-=dt;if(blinkT<0&&blinkP<0){blinkP=0;blinkT=2+Math.random()*3}
+  let bl=0;if(blinkP>=0){blinkP+=dt;bl=Math.sin(Math.min(1,blinkP/.16)*PI);if(blinkP>.16)blinkP=-1}
+  happyT=Math.max(0,happyT-dt);happyV+=((happyT>0?1:0)-happyV)*Math.min(1,dt*6);
+  em.setValue('blink',bl);em.setValue('happy',happyV)}
+ cur.update(dt);cur.scene.updateMatrixWorld(true);
+ if(holdK>.5){const hn=N('rightHand');if(hn){hn.getWorldPosition(tmp);slip.position.copy(tmp).add(new THREE.Vector3(Math.sin(cur.scene.rotation.y-baseYaw)*.05,.07,Math.cos(cur.scene.rotation.y-baseYaw)*.05));slip.rotation.y=cur.scene.rotation.y;slip.visible=true}}else slip.visible=false;
+ renderer.render(scene,camera);
+}
+requestAnimationFrame(tick);
+dispatchEvent(new Event('fh-ready'));
 </script>
 </body>
 </html>
